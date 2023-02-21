@@ -7,4 +7,7 @@ class User < ApplicationRecord
   def jwt_payload
     super
   end
+
+  has_many :posts, dependent: :destroy
+  has_many :comments, dependent: :destroy
 end

@@ -6,11 +6,14 @@ Rails.application.routes.draw do
     registrations: 'users/registrations'
   }
 
-  # get '/users_details' => 'users#signed_in_user'
+  get '/users_details' => 'users#signed_in_user'
   resources :users
+  resources :posts do
+    member do
+      get :find_post
+    end
+    resources :comments
+  end
 
-  resources :posts
-
-  resources :comments
   
 end

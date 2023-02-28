@@ -1,45 +1,63 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!
+  #before_action :authorize_request, only:[:index, :create]
+  before_action :authorize_request
+  before_action :find_post, only: [:show, :update, :destroy]
+
   def index
-    @posts = Post.all
+    @posts = current_user.posts.all
+    render json: @posts
+  end
+
+  def show
+    #@post = current_user.posts.find(params[:id])
     render json: @post
   end
 
-  # def show
-  #   render json: @user, status: :ok
-  # end
-
-  # def signed_in_user
-  #   #@current_user = current_user
-  #   render json: current_user, status: :ok
-  # end
-      
-
   def create
-    @post = Post.new(post_params)
+    @post = current_user.posts.new(post_params)
+
     if @post.save
       render json: @post, status: :created
     else
-      render json: @post.errors, status: :unprocessable_entity
+      render json: {errors: @post.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
   def update
+    @post = current_user.posts.find(params[:id])
     if @post.update(post_params)
-      render json: @post
+      render json: {success: "Post has been succefully updates"}, status: :ok
     else
-      render json: @post.errors, status: :unprocessable_entity
+      render json: {errors: @post.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
   def destroy
-   @post.destroy
+    if @post.destroy
+      render json: {success: "You have succefully deleted the post."}
+    else
+      render json: {errors: @post.errors.full_messages}, status: :unprocessable_entity
+    end
   end
 
-  private 
+  # def destroy
+  #   post = Post.find(params[:id])
+  #   if post.user_id != params[:user_id].to_i
+  #     render json: { error: "User ID does not match post owner" }, status: :unprocessable_entity
+  #   else
+  #     post.destroy
+  #     render json: { success: "Post deleted successfully" }, status: :ok
+  #   end
+  # end
+
+
+      
+  private
     def post_params
-      params.require(:post).permit(:name, :user_id)
+      params.require(:post).permit(:title, :description)
     end
 
-
+    def find_post
+      @post = current_user.posts.find(params[:id])
+    end
 end

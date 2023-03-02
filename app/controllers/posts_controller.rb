@@ -4,8 +4,8 @@ class PostsController < ApplicationController
   before_action :find_post, only: [:show, :update, :destroy]
 
   def index
-    @posts = current_user.posts.all
-    render json: @posts
+    @posts = current_user.posts.all.long_title
+    render json: @posts, each_serializer: PostSerializer
   end
 
   def show

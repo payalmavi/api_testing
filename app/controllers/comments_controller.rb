@@ -3,7 +3,9 @@ class CommentsController < ApplicationController
 	before_action :comments_for_specific_post, only:[:index]
 
 	def index
-		render json: @comment
+		@comment = current_user.posts.comments
+		debugger
+		render json: @comment, each_serializer :CommentSerializer
 	end
 
 	def show
